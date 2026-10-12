@@ -1,0 +1,11 @@
+node_modules/
+.private-uploads/
+.next/
+.env*
+!.env.example
+dist/
+coverage/
+npm-debug.log*
+
+# personal files
+resume_extract.txt

@@ -1,0 +1,263 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Flow ERP 기술 스택, 아키텍처, 요청 흐름, 보안 및 운영 구조 문서">
+  <title>Flow ERP | 기술과 아키텍처 안내</title>
+  <style>
+    :root{color-scheme:light;--ink:#172033;--muted:#46536a;--line:#cbd3df;--canvas:#e8ebf1;--surface:#fff;--accent:#493db8;--soft:#f0efff;--green:#176d50;--amber:#82510c}
+    *{box-sizing:border-box}
+    html{scroll-behavior:smooth}
+    body{margin:0;background:var(--canvas);color:var(--ink);font-family:Arial,"Malgun Gothic","Noto Sans KR",sans-serif;font-size:16px;line-height:1.7}
+    a{color:var(--accent);text-underline-offset:3px}
+    .wrap{width:min(1120px,calc(100% - 36px));margin:0 auto;padding:40px 0 64px}
+    .hero{padding:38px 42px;background:#202744;color:#fff;border-radius:18px;box-shadow:0 12px 28px #18213a24}
+    .eyebrow{margin:0 0 8px;color:#d9d6ff;font-size:13px;font-weight:700;letter-spacing:.08em}
+    h1{margin:0;font-size:clamp(30px,5vw,46px);line-height:1.2;letter-spacing:-.035em}
+    .hero p{max-width:760px;margin:15px 0 0;color:#e0e5f0;font-size:17px}
+    .hero-meta{margin-top:20px;color:#c7cede;font-size:13px}
+    .layout{display:grid;grid-template-columns:220px minmax(0,1fr);gap:22px;margin-top:22px;align-items:start}
+    nav,.card{background:var(--surface);border:1px solid var(--line);border-radius:14px;box-shadow:0 2px 5px #17203308}
+    nav{position:sticky;top:18px;padding:18px}
+    nav strong{display:block;margin-bottom:10px;font-size:14px}
+    nav a{display:block;padding:7px 9px;border-radius:7px;color:#354056;font-size:14px;text-decoration:none}
+    nav a:hover{background:var(--soft);color:var(--accent)}
+    main{display:grid;gap:16px;min-width:0}
+    .card{padding:26px 28px;scroll-margin-top:18px}
+    h2{margin:0 0 15px;font-size:23px;line-height:1.3;letter-spacing:-.02em}
+    h3{margin:22px 0 7px;font-size:17px}
+    p{margin:8px 0;color:#344056}
+    ul,ol{margin:10px 0 0;padding-left:23px;color:#344056}
+    li{padding:3px 0}
+    .grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+    .tile{padding:15px 16px;border:1px solid #d9deea;border-radius:10px;background:#fbfcfe}
+    .tile b{display:block;margin-bottom:4px;font-size:15px}
+    .tile p{margin:0;color:#46536a;font-size:14px}
+    .stack{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+    .stack .tile{border-top:4px solid #766be0}
+    .diagram{overflow-x:auto;padding:10px 0}
+    .diagram svg{display:block;width:100%;min-width:700px;height:auto}
+    .diagram text{font-family:Arial,"Malgun Gothic",sans-serif}
+    .steps{counter-reset:step;list-style:none;padding:0}
+    .steps li{position:relative;min-height:42px;padding:2px 0 12px 42px}
+    .steps li:before{counter-increment:step;content:counter(step);position:absolute;left:0;top:0;display:grid;place-items:center;width:28px;height:28px;border-radius:50%;background:var(--soft);color:var(--accent);font-weight:700}
+    table{width:100%;border-collapse:collapse;margin-top:12px;font-size:14px}
+    th,td{padding:11px 12px;border:1px solid var(--line);text-align:left;vertical-align:top}
+    th{background:#f0f2f7;color:#273247;font-weight:700}
+    td{color:#3b465a}
+    code{padding:2px 5px;border:1px solid #dde1eb;border-radius:5px;background:#f5f6f9;color:#25304a;font-family:Consolas,"Courier New",monospace;font-size:.9em;overflow-wrap:anywhere}
+    .callout{margin-top:14px;padding:14px 16px;border-left:4px solid #d38c28;border-radius:7px;background:#fff8e9;color:#573c10}
+    .callout p{margin:0;color:inherit}
+    .good{border-left-color:#31906c;background:#edf8f2;color:#194e3c}
+    .refs{display:flex;flex-wrap:wrap;gap:8px;margin-top:15px}
+    .refs a{display:inline-block;padding:7px 10px;border:1px solid #d5d9e5;border-radius:7px;background:#fff;font-size:13px;text-decoration:none}
+    footer{padding:14px 4px;color:#48546a;font-size:13px;text-align:center}
+    @media(max-width:800px){.layout{grid-template-columns:1fr}.layout nav{position:static}.layout nav div{display:grid;grid-template-columns:repeat(2,minmax(0,1fr))}.hero{padding:28px 24px}.card{padding:22px}.stack{grid-template-columns:1fr}}
+    @media(max-width:520px){.wrap{width:min(100% - 22px,1120px);padding-top:12px}.grid{grid-template-columns:1fr}.hero{border-radius:12px}.card{padding:18px}.layout nav div{grid-template-columns:1fr 1fr}body{font-size:15px}}
+    @media print{body{background:#fff;font-size:11pt}.wrap{width:100%;padding:0}.hero{background:#fff;color:#111;border:2px solid #202744;box-shadow:none}.hero p,.hero-meta,.eyebrow{color:#273247}.layout{display:block}.layout nav{display:none}.card{break-inside:avoid;box-shadow:none;margin:12px 0;padding:18px}a{color:#222;text-decoration:none}.refs a{border:0;padding:2px}.diagram svg{min-width:0}.callout{print-color-adjust:exact;-webkit-print-color-adjust:exact}}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header class="hero">
+      <p class="eyebrow">FLOW ERP · ENGINEERING GUIDE</p>
+      <h1>기술과 아키텍처 안내</h1>
+      <p>프로젝트, 업무, 일일 보고를 관리하는 사내 웹 애플리케이션의 기술 구성과 주요 데이터·요청 흐름을 정리했습니다.</p>
+      <div class="hero-meta">문서 기준: 현재 저장소 구현 · 주요 스택: Next.js 14 · TypeScript · MySQL 8</div>
+    </header>
+
+    <div class="layout">
+      <nav aria-label="문서 목차"><strong>목차</strong><div>
+        <a href="#overview">한눈에 보기</a><a href="#stack">기술 스택</a><a href="#architecture">아키텍처</a>
+        <a href="#flows">요청 흐름</a><a href="#features">주요 기능</a><a href="#security">인증과 보안</a>
+        <a href="#data">데이터 구조</a><a href="#operations">운영과 한계</a><a href="#interview">포트폴리오·면접</a><a href="#source">코드 위치</a>
+      </div></nav>
+
+      <main>
+        <section class="card" id="overview">
+          <h2>한눈에 보기</h2>
+          <p>화면과 서버 API가 하나의 Next.js 애플리케이션에 있습니다. 브라우저 요청을 서버에서 인증·권한 확인·입력 검증한 뒤 TypeORM을 통해 MySQL에 반영합니다.</p>
+          <div class="grid">
+            <div class="tile"><b>화면과 API가 한 앱에</b><p>Next.js App Router가 서버 페이지, 클라이언트 UI, JSON API를 함께 제공합니다.</p></div>
+            <div class="tile"><b>역할에 따른 접근 제어</b><p>시스템 역할과 프로젝트별 역할을 함께 확인해 프로젝트 데이터를 제한합니다.</p></div>
+            <div class="tile"><b>명시적 스키마 변경</b><p>TypeORM 자동 동기화를 끄고 버전 관리되는 마이그레이션으로 DB를 변경합니다.</p></div>
+            <div class="tile"><b>외부 연동은 선택 설정</b><p>AI, 이메일 알림, 장애 알림은 환경변수가 연결된 경우에만 사용합니다.</p></div>
+          </div>
+        </section>
+
+        <section class="card" id="stack">
+          <h2>기술 스택</h2>
+          <div class="stack">
+            <div class="tile"><b>웹 프레임워크</b><p>Next.js 14 App Router, React 18, TypeScript</p></div>
+            <div class="tile"><b>인증과 세션</b><p>Auth.js Credentials, JWT 세션, bcrypt 비밀번호 해시</p></div>
+            <div class="tile"><b>데이터베이스</b><p>MySQL 8, TypeORM, 명시적 SQL 마이그레이션</p></div>
+            <div class="tile"><b>입력 검증</b><p>Zod 스키마로 API 요청 값 검증</p></div>
+            <div class="tile"><b>UI 스타일</b><p>전역 CSS와 Tailwind 설정, 반응형 페이지 레이아웃</p></div>
+            <div class="tile"><b>운영 도구</b><p>GitHub Actions CI, PowerShell 백업·상태 점검·복구 훈련 스크립트</p></div>
+          </div>
+        </section>
+
+        <section class="card" id="architecture">
+          <h2>애플리케이션 아키텍처</h2>
+          <p>서버 로직은 데이터 접근과 인증, 감사 기록, 알림, 파일 처리를 작은 모듈로 나눕니다. 파일 본문은 DB 대신 비공개 파일 저장소에 둡니다.</p>
+          <div class="diagram">
+            <svg viewBox="0 0 940 330" role="img" aria-labelledby="diagram-title diagram-desc">
+              <title id="diagram-title">Flow ERP 아키텍처</title><desc id="diagram-desc">브라우저는 Next.js 페이지와 API를 호출하고, 인증 및 서버 로직은 TypeORM을 통해 MySQL에 접근합니다. 파일은 비공개 저장소에 저장하며 AI와 웹훅은 선택 설정입니다.</desc>
+              <defs><marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto"><path d="M0,0 L0,6 L9,3 z" fill="#667085"/></marker></defs>
+              <g fill="#fff" stroke="#bbc5d5" stroke-width="2">
+                <rect x="20" y="112" width="145" height="82" rx="12"/><rect x="220" y="112" width="160" height="82" rx="12"/>
+                <rect x="440" y="50" width="180" height="82" rx="12"/><rect x="440" y="174" width="180" height="82" rx="12"/>
+                <rect x="700" y="50" width="190" height="82" rx="12"/><rect x="700" y="174" width="190" height="82" rx="12"/>
+              </g>
+              <g fill="none" stroke="#667085" stroke-width="2.5" marker-end="url(#arrow)">
+                <path d="M165 153 H215"/><path d="M380 140 L435 105"/><path d="M380 166 L435 211"/>
+                <path d="M620 91 H695"/><path d="M620 215 H695"/><path d="M530 174 V138"/>
+              </g>
+              <g text-anchor="middle" fill="#1d2939">
+                <text x="92" y="147" font-size="18" font-weight="700">사용자 브라우저</text><text x="92" y="173" font-size="14">React UI</text>
+                <text x="300" y="147" font-size="18" font-weight="700">Next.js</text><text x="300" y="173" font-size="14">페이지 · API</text>
+                <text x="530" y="84" font-size="18" font-weight="700">인증 · 권한</text><text x="530" y="110" font-size="14">Auth.js · 역할 검사</text>
+                <text x="530" y="208" font-size="18" font-weight="700">서버 로직</text><text x="530" y="234" font-size="14">검증 · 도메인 처리</text>
+                <text x="795" y="84" font-size="18" font-weight="700">MySQL</text><text x="795" y="110" font-size="14">TypeORM · 마이그레이션</text>
+                <text x="795" y="208" font-size="18" font-weight="700">외부·파일</text><text x="795" y="234" font-size="14">비공개 저장소 · 선택 연동</text>
+              </g>
+              <text x="470" y="305" text-anchor="middle" fill="#596579" font-size="14">모든 쓰기 요청은 서버에서 세션, 역할, 입력값을 검사한 다음 저장합니다.</text>
+            </svg>
+          </div>
+        </section>
+
+        <section class="card" id="flows">
+          <h2>일반 요청 흐름</h2>
+          <ol class="steps">
+            <li>사용자가 화면에서 프로젝트·업무·보고서 데이터를 요청하거나 수정합니다.</li>
+            <li>Next.js API가 Auth.js 세션을 확인하고, 활성 사용자 계정을 DB에서 재확인합니다.</li>
+            <li>요청 본문을 Zod로 검증하고 시스템 역할 및 프로젝트 멤버십을 검사합니다.</li>
+            <li>TypeORM이 MySQL에서 데이터를 읽거나 저장합니다. 파일 업로드는 비공개 저장 경로에 저장합니다.</li>
+            <li>중요 변경은 감사 로그에 기록하고, 해당 이벤트의 알림 설정에 따라 앱 알림 또는 웹훅 전달을 시도합니다.</li>
+            <li>JSON 응답을 받아 React 화면이 갱신됩니다.</li>
+          </ol>
+          <h3>가입과 로그인</h3>
+          <p>공개 회원가입은 없습니다. 관리자가 만든 48시간 유효 초대 링크로 사용자가 계정을 생성합니다. 첫 관리자는 명령행의 <code>npm run admin:create</code>로 생성합니다. 로그인은 이메일과 비밀번호를 사용하고, MFA가 켜진 관리자는 인증 코드 또는 복구 코드도 입력합니다.</p>
+          <h3>보고서용 AI 초안</h3>
+          <p>사용자가 입력한 메모를 설정된 OpenAI 호환 API에 보내 초안을 받습니다. 초안은 자동 저장되지 않으며 사용자가 확인해 적용합니다. AI 연결 정보가 없으면 수동 보고 기능은 계속 쓸 수 있습니다.</p>
+        </section>
+
+        <section class="card" id="features">
+          <h2>주요 기능</h2>
+          <table><thead><tr><th>영역</th><th>동작</th></tr></thead><tbody>
+            <tr><td>대시보드</td><td>서울 날짜 기준 오늘의 보고 제출 여부, 내 업무, 마감·지연 업무, 접근 가능한 프로젝트를 요약합니다.</td></tr>
+            <tr><td>프로젝트와 업무</td><td>멤버십에 따라 프로젝트를 노출합니다. 프로젝트 관리자는 업무 상세 필드를 편집하고, 담당자는 자신의 업무 상태를 변경할 수 있습니다.</td></tr>
+            <tr><td>일일 보고</td><td>날짜별 보고와 프로젝트 연결 항목을 저장하고 제출합니다. 관리자와 프로젝트 관리자의 보고 조회 범위가 다릅니다.</td></tr>
+            <tr><td>문서</td><td>프로젝트 권한을 확인해 문서를 업로드·다운로드·삭제합니다. PDF, 텍스트, CSV, 이미지와 Office 파일을 지원합니다.</td></tr>
+            <tr><td>검색·알림</td><td>사용자에게 허용된 프로젝트·업무를 검색합니다. 업무 배정, 보고 제출, 보고 댓글 알림을 사용자별로 조정합니다.</td></tr>
+            <tr><td>관리</td><td>직원 초대, 역할·계정 활성화 관리, 관리자 MFA 설정을 제공합니다.</td></tr>
+          </tbody></table>
+        </section>
+
+        <section class="card" id="security">
+          <h2>인증과 보안</h2>
+          <div class="grid">
+            <div class="tile"><b>세션</b><p>JWT 세션, 최대 수명 8시간. 보호된 API에서 활성 계정을 다시 확인합니다.</p></div>
+            <div class="tile"><b>로그인 제한</b><p>이메일 해시별 15분 내 실패 5회를 제한합니다.</p></div>
+            <div class="tile"><b>관리자 MFA</b><p>TOTP 비밀은 AES-256-GCM으로 암호화합니다. 복구 코드는 SHA-256 해시로 저장하고 각 코드를 한 번만 사용합니다.</p></div>
+            <div class="tile"><b>API 권한·요청 제한</b><p>프로젝트 멤버십과 역할을 서버에서 검사하며 민감한 API는 DB 기반 요청 제한을 사용합니다.</p></div>
+            <div class="tile"><b>파일 경로</b><p>파일 키를 검증하고 공개 웹 폴더 밖에 저장합니다. 파일 이름은 경로 구분자와 제어 문자를 제거합니다.</p></div>
+            <div class="tile"><b>감사 기록</b><p>프로젝트·사용자·업무·문서 관련 주요 변경을 감사 로그에 남깁니다.</p></div>
+          </div>
+          <div class="callout"><p><b>운영 키 관리:</b> MFA를 켜기 전에 `MFA_ENCRYPTION_KEY`에 무작위 base64 32바이트 키를 설정하고, 운영 DB와 분리해 안전하게 백업해야 합니다.</p></div>
+        </section>
+
+        <section class="card" id="data">
+          <h2>데이터 구조</h2>
+          <table><thead><tr><th>데이터</th><th>주요 연결 관계</th><th>용도</th></tr></thead><tbody>
+            <tr><td>Users, Teams</td><td>TeamMembership</td><td>계정과 팀 구성원 관계</td></tr>
+            <tr><td>Projects</td><td>ProjectMember → User, project_id → Project</td><td>프로젝트 접근 및 프로젝트별 역할</td></tr>
+            <tr><td>Tasks</td><td>Project, assignee User, creator User</td><td>담당자·상태·우선순위·일정이 있는 업무</td></tr>
+            <tr><td>DailyReports</td><td>User + reportDate, ReportItems → Project/Task</td><td>날짜별 보고와 프로젝트 연결 항목</td></tr>
+            <tr><td>ReportComments</td><td>DailyReport, author User</td><td>보고서 검토 댓글</td></tr>
+            <tr><td>ProjectDocuments</td><td>Project, uploader User</td><td>파일 메타데이터; 실제 파일은 디스크에 저장</td></tr>
+            <tr><td>Notifications</td><td>User, NotificationPreferences</td><td>개인 알림과 유형별 채널 설정</td></tr>
+            <tr><td>AuditLogs, rate-limit tables</td><td>actor / target / bucket key</td><td>변경 추적과 로그인·API 요청 제한</td></tr>
+          </tbody></table>
+          <p>테이블과 TypeORM 엔티티는 <code>src/server/entities.ts</code>에, 스키마 변경 이력은 <code>src/server/migrations</code>에 있습니다. <code>synchronize</code>와 자동 마이그레이션 실행은 꺼져 있습니다.</p>
+        </section>
+
+        <section class="card" id="operations">
+          <h2>운영과 한계</h2>
+          <ul>
+            <li><b>CI:</b> GitHub Actions에서 MySQL을 띄우고 마이그레이션과 Next.js 빌드를 수행하도록 구성했습니다.</li>
+            <li><b>헬스 체크:</b> <code>/api/health</code>가 앱과 DB 연결을 확인합니다. PowerShell 점검 스크립트는 실패 알림 웹훅을 지원합니다.</li>
+            <li><b>백업·복구:</b> PowerShell 백업 스크립트는 DB 덤프, 업로드 아카이브, SHA-256 매니페스트를 생성합니다. 복구 훈련은 별도 복구 DB를 대상으로 실행하도록 설계됐습니다.</li>
+            <li><b>배포:</b> CI만 설정돼 있습니다. 실제 배포는 프로젝트의 운영 플랫폼이 정해지지 않아 연결되지 않았습니다.</li>
+            <li><b>이메일:</b> 내장 SMTP는 없습니다. 알림 이메일은 `NOTIFICATION_WEBHOOK_URL`에 연결한 신뢰 가능한 메일 릴레이가 담당합니다.</li>
+            <li><b>파일 저장:</b> 기본 저장소는 서버 로컬 파일 시스템입니다. 여러 앱 인스턴스를 운영하면 공유 영속 저장소가 필요합니다.</li>
+            <li><b>검증 상태:</b> 최근 코드 변경 이후 빌드·테스트와 실제 복구 훈련은 아직 실행하지 않았습니다.</li>
+          </ul>
+          <div class="callout good"><p>배포 전에는 백업 → 대기 마이그레이션 확인 → 마이그레이션 적용 → 빌드·배포 → 헬스 체크 순서로 진행하고, 주기적으로 격리 복구 훈련을 수행합니다.</p></div>
+        </section>
+
+        <section class="card" id="interview">
+          <h2>포트폴리오 소개와 예상 면접 질문</h2>
+          <h3>30초 프로젝트 소개</h3>
+          <div class="callout good"><p>“Flow ERP는 팀의 프로젝트와 업무, 일일 보고를 한곳에서 관리하는 사내 웹앱입니다. Next.js와 TypeScript로 화면과 API를 구성하고, MySQL·TypeORM으로 데이터를 관리했습니다. 특히 프로젝트별 권한 검사를 API 서버에 두고, 관리자 MFA, 감사 로그, 파일 권한 검사와 명시적 DB 마이그레이션을 구현해 업무 기능과 운영 보안을 함께 고려했습니다.”</p></div>
+
+          <h3>1. 이 프로젝트에서 가장 중요하게 고려한 설계는 무엇인가요?</h3>
+          <p><b>답변 예시:</b> “권한을 화면 표시만으로 처리하지 않고 API에서 매 요청마다 확인하는 점입니다. 사용자의 전체 역할과 프로젝트 멤버십을 함께 검사하고, 프로젝트 관리자는 관리 프로젝트에 연결된 보고 항목만 볼 수 있게 범위를 제한했습니다. 화면은 편의성을 위한 것이고 최종 접근 제어는 서버에서 수행하도록 했습니다.”</p>
+
+          <h3>2. 왜 Next.js 안에 화면과 API를 함께 구성했나요?</h3>
+          <p><b>답변 예시:</b> “이 앱은 사내 업무 도구 MVP라서 프론트엔드와 API를 한 프로젝트에서 관리하는 편이 구현·배포 흐름을 단순하게 만들었습니다. App Router의 서버 페이지와 Route Handler를 기능 단위로 정리했습니다. 규모가 커지거나 여러 클라이언트가 같은 도메인 API를 쓰기 시작하면 API를 별도 서비스로 분리할 수 있게 데이터 접근과 서버 로직을 모듈화하는 방향을 고려할 수 있습니다.”</p>
+
+          <h3>3. 권한 검사는 어떤 순서로 이뤄지나요?</h3>
+          <p><b>답변 예시:</b> “먼저 Auth.js 세션에서 사용자 ID를 확인하고 DB에서 계정이 활성 상태인지 확인합니다. 그 다음 시스템 역할과 프로젝트 멤버십을 확인한 뒤, 요청한 데이터가 그 프로젝트에 속하는지 검사합니다. 예를 들어 담당자는 자기에게 배정된 업무의 상태를 바꿀 수 있고, 프로젝트 관리자는 업무 상세 필드를 편집할 수 있습니다.”</p>
+
+          <h3>4. 스키마 변경에 TypeORM synchronize를 쓰지 않은 이유는 무엇인가요?</h3>
+          <p><b>답변 예시:</b> “운영 DB 구조가 애플리케이션 실행 시점에 예기치 않게 바뀌는 일을 막기 위해서입니다. 변경 내역을 마이그레이션 코드로 리뷰하고, 배포 전에 대기 마이그레이션을 확인한 뒤 명시적으로 적용하도록 했습니다. MySQL DDL은 자동 롤백을 기대하기 어려워 백업과 실패 후 점검 절차도 운영 문서에 포함했습니다.”</p>
+
+          <h3>5. 관리자 MFA와 복구 코드는 어떻게 보호하나요?</h3>
+          <p><b>답변 예시:</b> “TOTP 비밀은 서버 환경의 32바이트 키를 사용해 AES-256-GCM으로 암호화해 저장합니다. 복구 코드는 원문 대신 SHA-256 해시만 저장하고, 사용 시 조건부 갱신으로 한 번만 소비되게 합니다. 암호화 키를 잃으면 기존 TOTP 비밀을 복호화할 수 없으므로 별도 백업과 운영·스테이징 키 분리를 안내합니다.”</p>
+
+          <h3>6. 문서 파일은 왜 DB에 저장하지 않았나요?</h3>
+          <p><b>답변 예시:</b> “DB에는 프로젝트, 업로더, 파일 유형, 크기, 저장 키 같은 검색·권한 확인용 메타데이터를 보관하고 파일 본문은 비공개 파일 저장소에 둡니다. 저장 키는 서버가 생성하고 경로를 검증하며, 프로젝트 권한 확인 후 파일을 제공합니다. 여러 앱 서버에서 운영할 때는 공유 영속 저장소가 필요하고 DB와 파일을 같은 백업 시점으로 맞춰야 합니다.”</p>
+
+          <h3>7. AI 기능은 업무 데이터 노출을 어떻게 줄이나요?</h3>
+          <p><b>답변 예시:</b> “AI 초안 요청에는 사용자가 입력한 메모만 외부 OpenAI 호환 API로 보냅니다. 직원·프로젝트 전체 데이터나 DB 레코드를 함께 전달하지 않고, 생성 결과도 자동 저장하지 않습니다. 사용자가 검토하고 직접 적용하도록 해 생성 결과를 확정된 업무 기록과 구분했습니다.”</p>
+
+          <h3>8. 실제로 겪은 DB 마이그레이션 문제와 해결은 무엇인가요?</h3>
+          <p><b>답변 예시:</b> “알림 설정 테이블을 추가할 때 MySQL이 `user_id`와 `users.id`의 외래 키 타입이 호환되지 않는다고 거절했습니다. 새 테이블이 DB 기본 collation을 사용하고 기존 `users` 테이블은 `utf8mb4_0900_ai_ci`를 명시한 점을 원인으로 보고, 마이그레이션에 같은 문자셋과 collation을 지정했습니다. 코드 수정 후 실제 운영 DB에서 재실행·검증하는 절차는 별도로 필요합니다.”</p>
+
+          <h3>9. 현재 구현의 한계와 다음 개선 순서는 무엇인가요?</h3>
+          <p><b>답변 예시:</b> “코드에는 CI 워크플로와 운영 스크립트를 추가했지만 실제 CI 실행, 통합 테스트, 복구 훈련은 아직 확인하지 않았습니다. 다음에는 권한·보고 저장·문서 접근 경로를 우선 자동 테스트하고, 격리 DB에서 마이그레이션과 복구 훈련을 검증하겠습니다. 운영 배포 플랫폼을 정한 뒤 배포 파이프라인과 공유 파일 저장소도 연결할 계획입니다.”</p>
+
+          <h3>면접 전 확인할 체크리스트</h3>
+          <ul>
+            <li>직접 작성·수정한 코드 범위와 팀 작업 범위를 정확히 설명합니다.</li>
+            <li>실제 실행하지 않은 빌드·테스트·배포·복구 훈련은 완료했다고 말하지 않습니다.</li>
+            <li>DB 마이그레이션 이슈는 원인, 수정 내용, 아직 필요한 검증을 나눠 설명합니다.</li>
+            <li>실제 배포 주소나 사용량이 없다면 운영 성과 수치를 만들지 않습니다.</li>
+            <li>면접 전 주요 API 하나를 선택해 인증, 입력 검증, 권한 검사, DB 쓰기 흐름을 코드로 따라가 봅니다.</li>
+          </ul>
+        </section>
+
+        <section class="card" id="source">
+          <h2>코드 위치</h2>
+          <div class="refs">
+            <a href="../src/app">화면·API 라우트</a>
+            <a href="../src/server/entities.ts">엔티티</a>
+            <a href="../src/server/data-source.ts">DB 연결</a>
+            <a href="../src/server/auth.ts">인증</a>
+            <a href="../src/server/http.ts">세션·권한 검사</a>
+            <a href="../src/server/security.ts">MFA·암호화</a>
+            <a href="../src/server/rate-limit.ts">요청 제한</a>
+            <a href="../src/server/notifications.ts">알림 전달</a>
+            <a href="../.github/workflows/ci.yml">CI</a>
+            <a href="../OPERATIONS.md">운영 절차</a>
+          </div>
+          <p>이 문서는 코드 구조를 설명하기 위한 안내 자료입니다. 실제 운영 설정과 배포 환경이 바뀌면 운영 담당자가 환경변수, 저장소, 백업 및 배포 연결을 함께 갱신해야 합니다.</p>
+        </section>
+      </main>
+    </div>
+    <footer>Flow ERP · 기술 구조 문서</footer>
+  </div>
+</body>
+</html>

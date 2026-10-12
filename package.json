@@ -1,0 +1,8 @@
+{
+  "name": "ai-work-project-erp",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {"dev": "next dev", "build": "next build", "start": "next start", "lint": "next lint", "admin:create": "ts-node -P tsconfig.cli.json scripts/create-admin.ts", "admin:create-default": "ts-node -P tsconfig.cli.json scripts/create-default-admin.ts", "migration:show": "ts-node -P tsconfig.cli.json scripts/migration.ts show", "migration:run": "ts-node -P tsconfig.cli.json scripts/migration.ts run", "migration:revert": "ts-node -P tsconfig.cli.json scripts/migration.ts revert", "migration:create": "typeorm-ts-node-commonjs migration:create", "migration:generate": "typeorm-ts-node-commonjs migration:generate -d src/server/data-source.ts"},
+  "dependencies": {"@auth/core": "^0.37.2", "bcryptjs": "^2.4.3", "class-validator": "^0.14.1", "mysql2": "^3.11.5", "next": "^14.2.15", "next-auth": "^5.0.0-beta.25", "react": "^18.3.1", "react-dom": "^18.3.1", "reflect-metadata": "^0.2.2", "typeorm": "^0.3.20", "zod": "^3.23.8"},
+  "devDependencies": {"@types/bcryptjs": "^2.4.6", "@types/node": "^22.9.0", "@types/react": "^18.3.12", "@types/react-dom": "^18.3.1", "autoprefixer": "^10.4.20", "postcss": "^8.4.49", "tailwindcss": "^3.4.15", "ts-node": "^10.9.2", "typescript": "^5.6.3", "typeorm-ts-node-commonjs": "^0.3.20"}
+}

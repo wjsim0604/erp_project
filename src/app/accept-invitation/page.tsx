@@ -1,0 +1,2 @@
+import AcceptInvitationForm from './form';
+export default function AcceptInvitationPage({ searchParams }: { searchParams: { token?: string; email?: string } }) { return <main className="login-page"><section className="login-card"><a className="brand login-brand" href="/"><span className="brand-mark">F</span><span>flow<span className="brand-light">works</span></span></a><h1>팀 초대 수락</h1><p>초대받은 계정을 만들고 업무 공간에 참여하세요.</p><AcceptInvitationForm token={searchParams.token ?? ''} email={searchParams.email ?? ''}/></section></main>; }
